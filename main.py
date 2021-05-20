@@ -1,7 +1,7 @@
 import os
 
 import GetNewFilesFromURL
-import OpenFileAsDataframeAndAddColumn
+import OpenFileAsDataframe
 import RegexFileName
 
 # This is the main function of this Python Project
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # Open each file in the excelFiles folder as dataframe and add column month / year to the dataframe
     for filename in os.listdir(excelFileDirectory):
-        OpenFileAsDataframeAndAddColumn.openFileAsDataframeAndAddColumn(filename)
+        OpenFileAsDataframe.openFileAsDataframe(filename)
 
     # Create List of month/year strings to create column in dataframe for each file
     # Get the filename as month for input to database as month/year column
