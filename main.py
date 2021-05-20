@@ -1,15 +1,10 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-# Press the green button in the gutter to run the script.
 import os
 
 import GetNewFilesFromURL
 import OpenFileAsDataframeAndAddColumn
 import RegexFileName
 
+# This is the main function of this Python Project
 if __name__ == '__main__':
 
     # Flag determines run state of program
@@ -65,9 +60,5 @@ if __name__ == '__main__':
     # Get the filename as month for input to database as month/year column
     nameOfFile = RegexFileName.regexFileName('april-2020.xlsx')
 
-
-
     # Prompt user that program has finished execution
     print("Program run finished!")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
