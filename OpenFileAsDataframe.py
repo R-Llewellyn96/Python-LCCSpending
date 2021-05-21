@@ -9,4 +9,5 @@ def openFileAsDataframe(passedFile):
 
     df = pd.read_excel(folder + passedFile, engine='openpyxl', parse_dates=True,
                        converters={'COLUMN': pd.to_datetime})
+    df = df.dropna(how='all', axis='columns')
     print(df.head())
