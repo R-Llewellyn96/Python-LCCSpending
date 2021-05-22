@@ -58,7 +58,7 @@ def createTable(lccSpendingDbConnection):
     dbCursor = lccSpendingDbConnection.cursor()
 
     # Execute SQL statement to create table to hold excel records
-    dbCursor.execute("CREATE TABLE IF NOT EXISTS `lccspending`.`spendingrecords` ( `id` INT NOT NULL AUTO_INCREMENT , `Service Area` VARCHAR(255) NOT NULL , `Expense Type` VARCHAR(255) NOT NULL , `Description` VARCHAR(255) NOT NULL , `SAP Document Number` BIGINT NOT NULL , `Posting date` DATE NOT NULL , `Vendor` VARCHAR(255) NOT NULL , `Actual Value` FLOAT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;")
+    dbCursor.execute("CREATE TABLE IF NOT EXISTS `lccspending`.`spendingrecords` ( `id` INT NOT NULL AUTO_INCREMENT , `Service Area` VARCHAR(255) NOT NULL , `Expense Type` VARCHAR(255) NOT NULL , `Description` VARCHAR(255) NOT NULL , `SAP Document Number` BIGINT NOT NULL , `Posting date` DATE NOT NULL , `Vendor` VARCHAR(255) NOT NULL , `Actual Value` DECIMAL(18,2) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;")
 
 # Delete Table (Useful for repeated runs)
 def dropTable(lccSpendingDbConnection):
