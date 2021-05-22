@@ -6,4 +6,6 @@ def mergeDataframes(dataFramesToMerge):
 
     # Merge dataframe list into one large dataframe, dont sort values, ignore index
     mergedDataframe = pd.concat(dataFramesToMerge, ignore_index=True, sort=False)
+
+    # Return merged dataframe to caller
     return mergedDataframe

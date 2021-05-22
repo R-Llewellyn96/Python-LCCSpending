@@ -1,20 +1,21 @@
 import os
-
 import pandas as pd
-from datetime import datetime
 
 
 # Function will attempt to open each file in the excelFiles folder and add a column for month/year using pandas
 def openFileAsDataframe(passedFile):
+
+    # Define directory where excel files have been downloaded and saved to
     folder = os.getcwd() + '/excelFiles/'
 
-    # Define Date/Time parser for UK standard date, without time
-    # dateFormatUK = lambda x: datetime.strptime(x, '%d/%m/%Y')
-
+    # Read Excel file, using openpyxl engine
     df = pd.read_excel(folder + passedFile, engine='openpyxl')
+
+    # Parse correct date from file in UK format
     df['Posting date'] = pd.to_datetime(df['Posting date'], dayfirst=True).dt.date
-    # df = pd.read_excel(folder + passedFile, engine='openpyxl', parse_dates=['Posting date'])
-    # converters={'COLUMN': pd.to_datetime}
+
+    # Drop NaN values and columns
     df = df.dropna(how='all', axis='columns')
 
+    # Return clean dataframe to caller
     return df

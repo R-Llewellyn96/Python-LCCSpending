@@ -3,17 +3,25 @@ import mysql.connector
 
 # Connect to MySQL Database
 def connectToMySQL():
+
+    # Define connection parameters
     myDb = mysql.connector.connect(
         host="localhost",
         user="yourusername",
         password="yourpassword"
     )
+
+    # Return connection object to caller
     return myDb
 
 
 # Create Database
 def createDb(myDb):
+
+    # Terminal cursor allows for execution of SQL Queries
     dbCursor = myDb.cursor()
+
+    # Create Database to hold our excel data
     dbCursor.execute("CREATE DATABASE lccspending")
 
 
@@ -40,12 +48,16 @@ def checkDbExists(myDb):
 
 # When database has been created, connect to it.
 def connectToDb():
+
+    # Connection parameters to connect to database directly
     lccSpendingDbConnection = mysql.connector.connect(
         host="localhost",
         user="yourusername",
         password="yourpassword",
         database="lccspending"
     )
+
+    # Return database connection object to caller
     return lccSpendingDbConnection
 
 
@@ -55,7 +67,7 @@ def createTable(lccSpendingDbConnection):
     # Get cursor to make SQL commands
     dbCursor = lccSpendingDbConnection.cursor()
 
-    # Execute SQL statement
+    # Execute SQL statement to create table to hold excel records
     dbCursor.execute("CREATE TABLE spendingrecords ("
                      "id INT AUTO_INCREMENT PRIMARY KEY, "
                      "service_area VARCHAR(255), "

@@ -3,7 +3,6 @@ import os
 import GetNewFilesFromURL
 import MergeDataframes
 import OpenFileAsDataframe
-import RegexFileName
 
 # This is the main function of this Python Project
 if __name__ == '__main__':
@@ -82,7 +81,7 @@ if __name__ == '__main__':
 
     # Create List of month/year strings to create column in dataframe for each file
     # Get the filename as month for input to database as month/year column
-    #nameOfFile = RegexFileName.regexFileName('april-2020.xlsx')
+    # nameOfFile = RegexFileName.regexFileName('april-2020.xlsx')
 
     # Prompt user that program has finished execution
     print("Program run finished!")

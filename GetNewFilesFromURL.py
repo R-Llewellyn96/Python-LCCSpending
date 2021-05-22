@@ -4,6 +4,8 @@ import xmltodict
 
 # Get LCC Xml page, to grab monthly reports
 def getLCCXml(url):
+
+    # Try catch block, attempt to get XML from URL, if it fails throw exception
     try:
         return xmltodict.parse(urllib3.PoolManager().request('GET', url).data)
 
@@ -14,11 +16,23 @@ def getLCCXml(url):
 
 # Download file from url
 def getFileFromUrl(url, filename):
+
+    # Define URL and Filename for Excel file to download
     urlAndFilename = url + filename
+
+    # Deal with HTTP response to get request
     response = urllib3.PoolManager().request('GET', urlAndFilename)
+
+    # Create a new file in excelFiles directory and name it the filename from web XML
     fileToSave = open('excelFiles/'+filename, 'wb')
+
+    # Write response data to the new excel file
     fileToSave.write(response.data)
+
+    # Close data writer to excel file
     fileToSave.close()
+
+    # Release HTTP Get request connection to server
     response.release_conn()
 
 
@@ -41,5 +55,7 @@ def getNewFiles(url):
         listOfXlsxFilesFromXML.append(ContentXML[i]['Key'])
         i = i + 1
 
+    # Get each ExcelFile listed in web XML from web server
+    # and save to excelFiles directory
     for file in listOfXlsxFilesFromXML:
         getFileFromUrl(url, file)
