@@ -1,6 +1,7 @@
 import os
 
 import GetNewFilesFromURL
+import MergeDataframes
 import OpenFileAsDataframe
 import RegexFileName
 
@@ -28,6 +29,8 @@ if __name__ == '__main__':
             # Tell user program is fetching new files
             print("User selected to fetch new files, fetching...")
 
+            # Put a try catch block here in case fetching new files fails
+
             # Call function to get files from AWS
             GetNewFilesFromURL.getNewFiles('https://lpl-cl-files.s3-eu-west-1.amazonaws.com/')
 
@@ -52,13 +55,34 @@ if __name__ == '__main__':
     # Define the file directory for excel files
     excelFileDirectory = os.getcwd()+'/excelFiles/'
 
-    # Open each file in the excelFiles folder as dataframe and add column month / year to the dataframe
+    # Create a List of dataframes
+    listOfDataFrames = []
+
+    # Open each file in the excelFiles folder as dataframe and get back pandas dataframe for each
     for filename in os.listdir(excelFileDirectory):
-        OpenFileAsDataframe.openFileAsDataframe(filename)
+
+        # Returns file as a pandas dataframe,
+        fileAsDataFrame = OpenFileAsDataframe.openFileAsDataframe(filename)
+
+        # Add returned dataframe to list of dataframes
+        listOfDataFrames.append(fileAsDataFrame)
+
+    print("stop")
+
+    # Merge list of dataframes together into one, for uploading to MySQL database
+    mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
+
+    # Check MySQL Database connection
+
+    # Check Database exists, if not create
+
+    # Check Table exists, if not create
+
+    # Insert merged dataframe into MySQL database table
 
     # Create List of month/year strings to create column in dataframe for each file
     # Get the filename as month for input to database as month/year column
-    nameOfFile = RegexFileName.regexFileName('april-2020.xlsx')
+    #nameOfFile = RegexFileName.regexFileName('april-2020.xlsx')
 
     # Prompt user that program has finished execution
     print("Program run finished!")
