@@ -67,11 +67,9 @@ if __name__ == '__main__':
         # Add returned dataframe to list of dataframes
         listOfDataFrames.append(fileAsDataFrame)
 
-    print("stop")
-
     # Merge list of dataframes together into one, for uploading to MySQL database
-    #mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
-
+    mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
+    print("stop")
     # Check MySQL Database connection
     mySQLConnection = MySQLConnector.connectToMySQL()
 

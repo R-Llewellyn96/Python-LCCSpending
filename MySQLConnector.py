@@ -74,6 +74,8 @@ def insertDataframeToTable(lccSpendingDbConnection, df, tableName):
 
     # Create engine from pymysql
     engine = create_engine("mysql+pymysql://" + Cfg.username + ":" + Cfg.password + "@" + Cfg.host + "/" + Cfg.database)
+
+    # Upload Dataframe to MySQL
     df.to_sql(con=engine, name=tableName, if_exists='append', index=False)
 
 
