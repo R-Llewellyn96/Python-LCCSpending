@@ -2,6 +2,7 @@ import os
 
 import GetNewFilesFromURL
 import MergeDataframes
+import MySQLConnector
 import OpenFileAsDataframe
 
 # This is the main function of this Python Project
@@ -69,15 +70,28 @@ if __name__ == '__main__':
     print("stop")
 
     # Merge list of dataframes together into one, for uploading to MySQL database
-    mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
+    #mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
 
     # Check MySQL Database connection
+    mySQLConnection = MySQLConnector.connectToMySQL()
 
     # Check Database exists, if not create
+    MySQLConnector.createDb(mySQLConnection)
+
+    # Connect to Database
+    dbConnection = MySQLConnector.connectToDb()
+
+    # Drop table if exists
+    MySQLConnector.dropTable(dbConnection)
 
     # Check Table exists, if not create
+    MySQLConnector.createTable(dbConnection)
 
     # Insert merged dataframe into MySQL database table
+    for dataframe in listOfDataFrames:
+        MySQLConnector.insertDataframeToTable(dbConnection, dataframe, 'spendingrecords')
+    print("Table inserted!")
+
 
     # Create List of month/year strings to create column in dataframe for each file
     # Get the filename as month for input to database as month/year column

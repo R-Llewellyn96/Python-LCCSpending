@@ -1,18 +1,30 @@
+import sys
+
 import mysql.connector
+import pymysql
+from sqlalchemy import create_engine
 
 
 # Connect to MySQL Database
+import Cfg
+
+
 def connectToMySQL():
 
-    # Define connection parameters
-    myDb = mysql.connector.connect(
-        host="localhost",
-        user="yourusername",
-        password="yourpassword"
-    )
+    try:
+        # Define connection parameters
+        myDb = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='password'
+        )
 
-    # Return connection object to caller
-    return myDb
+        # Return connection object to caller
+        return myDb
+    except Exception as e:
+        print("Connecting to MySQL database failed, please check login details and database status and try again")
+        print("Exception: ", e.__cause__)
+        sys.exit()
 
 
 # Create Database
@@ -22,39 +34,17 @@ def createDb(myDb):
     dbCursor = myDb.cursor()
 
     # Create Database to hold our excel data
-    dbCursor.execute("CREATE DATABASE lccspending")
-
-
-# Check the database i want to connect to exists
-def checkDbExists(myDb):
-
-    # Get cursor to make SQL commands
-    dbCursor = myDb.cursor()
-
-    # Show databases execution command on mysql db
-    dbCursor.execute("SHOW DATABASES")
-
-    # found flag is set to false, set to True if database lccspending is found
-    dbFoundFlag = False
-    for db in dbCursor:
-        print(db)
-        if db == 'lccspending':
-            dbFoundFlag = True
-
-    # if flag is false create the db
-    if not dbFoundFlag:
-        createDb(myDb)
-
+    dbCursor.execute('CREATE DATABASE IF NOT EXISTS lccspending')
 
 # When database has been created, connect to it.
 def connectToDb():
 
     # Connection parameters to connect to database directly
     lccSpendingDbConnection = mysql.connector.connect(
-        host="localhost",
-        user="yourusername",
-        password="yourpassword",
-        database="lccspending"
+        host='localhost',
+        user='root',
+        password='password',
+        database='lccspending'
     )
 
     # Return database connection object to caller
@@ -68,38 +58,23 @@ def createTable(lccSpendingDbConnection):
     dbCursor = lccSpendingDbConnection.cursor()
 
     # Execute SQL statement to create table to hold excel records
-    dbCursor.execute("CREATE TABLE spendingrecords ("
-                     "id INT AUTO_INCREMENT PRIMARY KEY, "
-                     "service_area VARCHAR(255), "
-                     "expense_type VARCHAR(255),"
-                     "description VARCHAR(255),"
-                     "sap_document_number INT,"
-                     "posting_date DATE,"
-                     "vendor VARCHAR(255),"
-                     "actual_value FLOAT)")
+    dbCursor.execute("CREATE TABLE IF NOT EXISTS `lccspending`.`spendingrecords` ( `id` INT NOT NULL AUTO_INCREMENT , `Service Area` VARCHAR(255) NOT NULL , `Expense Type` VARCHAR(255) NOT NULL , `Description` VARCHAR(255) NOT NULL , `SAP Document Number` BIGINT NOT NULL , `Posting date` DATE NOT NULL , `Vendor` VARCHAR(255) NOT NULL , `Actual Value` FLOAT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;")
 
-
-# Check if table exists in Database
-def checkTableExists(lccSpendingDbConnection):
+# Delete Table (Useful for repeated runs)
+def dropTable(lccSpendingDbConnection):
 
     # Get cursor to make SQL commands
     dbCursor = lccSpendingDbConnection.cursor()
 
-    # Execute SQL command to get all tables in database
-    dbCursor.execute("SHOW TABLES")
+    # Execute SQL statement to create table to hold excel records
+    dbCursor.execute('DROP TABLE IF EXISTS spendingrecords')
 
-    # Set table found flag to False
-    tableFoundFlag = False
+# Insert DataFrame to table
+def insertDataframeToTable(lccSpendingDbConnection, df, tableName):
 
-    # Loop through tables in Database, if table i want is not present create it
-    for table in dbCursor:
-        print(table)
-        if table == 'spendingrecords':
-            tableFoundFlag = True
-
-    # if flag is false create the db
-    if not tableFoundFlag:
-        createTable(lccSpendingDbConnection)
+    # Create engine from pymysql
+    engine = create_engine("mysql+pymysql://" + Cfg.username + ":" + Cfg.password + "@" + Cfg.host + "/" + Cfg.database)
+    df.to_sql(con=engine, name=tableName, if_exists='append', index=False)
 
 
 # Insert values into table
