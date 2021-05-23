@@ -6,13 +6,9 @@ from tabulate import tabulate
 import GetNewFilesFromURL
 import MergeDataframes
 import MySQLConnector
-import mysql.connector
-
 import NamesOfMonths
 import OpenFileAsDataframe
-from IPython.display import display
 import locale
-from locale import atof
 
 # This is the main function of this Python Project
 import PlotGraph
@@ -37,11 +33,8 @@ if __name__ == '__main__':
             "Do you wish to get new files from server or analyse existing files?\n"
             "[1 = New Files, 2 = Existing Files]: \n")
 
-        # Converts the string into a integer
-        userChoice_number = txt
-
-        # Run program
-        if userChoice_number == '1':
+        # Check user input and perform following action
+        if txt == '1':
 
             # Tell user program is fetching new files
             print("User selected to fetch new files, fetching...")
@@ -58,7 +51,7 @@ if __name__ == '__main__':
             inputLoopFlag = True
 
         # User chose to analyse existing files
-        elif userChoice_number == '2':
+        elif txt == '2':
 
             # Input loop flag set to true to prevent repeating loop
             inputLoopFlag = True
@@ -86,7 +79,7 @@ if __name__ == '__main__':
 
     # Merge list of dataframes together into one, for uploading to MySQL database
     # (error, inputting 100,000+ records to MySQL in one insertion operation results in missing records)
-    #mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
+    # mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
 
     # Check Database exists, if not create
     MySQLConnector.createDb()
@@ -109,7 +102,7 @@ if __name__ == '__main__':
     listOfSANames = MergeDataframes.getTopFive(yearSpendDF)
 
     # Make a copy for Graphing use (Conversion to currency changes dType to String)
-    #yearSpendDFGraph = yearSpendDF.copy()
+    # yearSpendDFGraph = yearSpendDF.copy()
 
     # Get sum of department spending per month, list of dataframes
     dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
@@ -122,39 +115,72 @@ if __name__ == '__main__':
 
     # Merge monthly dataframes to plot per month as a line graph
     mergedDataframe = MergeDataframes.mergeDataframes(linePlotDf)
-    # Do Graphs first then print tables
 
-    # Plot line graph
-    PlotGraph.plotLineGraph(mergedDataframe, 'Yearly', yearToSearch)
+    # Set input loop flag to false,
+    # gather user input to ask if they want to see bar charts
+    inputLoopFlag = False
 
-    # MatPlotLib of spending per year in Bar chart
-    PlotGraph.plotBarChart(yearSpendDF, 'Yearly', yearToSearch)
+    # While flag is false repeat this...
+    while not inputLoopFlag:
 
-    # MatPlotLib of spending per year in Bar chart Logarithmic
-    PlotGraph.plotBarChartLog(yearSpendDF, 'Yearly', yearToSearch)
+        # Prompt user whether they wish to continue
+        txt2 = input(
+            "\nThis program has fetched yearly and monthly spending for Liverpool City Council\n"
+            "Do you wish to view this information in Bar and Line graphs?\n"
+            "[1 = Yes, 2 = No]: \n")
 
-    # MatPlotLib of spending per month in pie chart
-    # For each month print the table with spending by department
-    # Iterate over the month number until all records are done
-    monthNum = 1
-    for monthlyDf in dfSpendingPerMonth:
+        # Check user input and perform following action
+        if txt2 == '1':
 
-        # Check Month number is not greater than 12,
-        # if it is then reset to 1 in case multiple years will be evaluated
-        if monthNum > 12:
+            # Tell user program is fetching new files
+            print("Generating Graphs and Charts...")
+
+            # MatPlotLib of spending for each department over a year line graph
+            # Plot line graph
+            PlotGraph.plotLineGraph(mergedDataframe, 'Yearly', yearToSearch)
+
+            # MatPlotLib of spending per year in Bar chart
+            PlotGraph.plotBarChart(yearSpendDF, 'Yearly', yearToSearch)
+
+            # MatPlotLib of spending per year in Bar chart Logarithmic
+            PlotGraph.plotBarChartLog(yearSpendDF, 'Yearly', yearToSearch)
+
+            # For each month print the table with spending by department
+            # Iterate over the month number until all records are done
             monthNum = 1
+            for monthlyDf in dfSpendingPerMonth:
 
-        # Get name of Month
-        monthLabel = NamesOfMonths.getMonthName(monthNum)
+                # Check Month number is not greater than 12,
+                # if it is then reset to 1 in case multiple years will be evaluated
+                if monthNum > 12:
+                    monthNum = 1
 
-        # Plot bar graph in both Standard and Logarithmic form
-        PlotGraph.plotBarChart(monthlyDf, monthLabel, yearToSearch)
-        PlotGraph.plotBarChartLog(monthlyDf, monthLabel, yearToSearch)
+                # Get name of Month
+                monthLabel = NamesOfMonths.getMonthName(monthNum)
 
-        # Iterate month number
-        monthNum += 1
+                # Plot bar graph in both Standard and Logarithmic form
+                PlotGraph.plotBarChart(monthlyDf, monthLabel, yearToSearch)
+                PlotGraph.plotBarChartLog(monthlyDf, monthLabel, yearToSearch)
 
-    # MatPlotLib of spending for each department over a year line graph
+                # Iterate month number
+                monthNum += 1
+
+            print("Graphs finished and saved as .png in \'graphs/standard/\' and \'graphs/logs/\'")
+
+            # Input loop flag set to true to prevent repeating loop
+            inputLoopFlag = True
+
+        # User chose not to view graphs
+        elif txt2 == '2':
+
+            # Input loop flag set to true to prevent repeating loop
+            inputLoopFlag = True
+
+            # Tell user program is analysing
+            print("User selected not to view graphs, skipping...")
+
+            # Break out of loop and end program run
+            break
 
     # Convert spending dataframe amounts to use pounds
     # Set Locale to GB and GBPFormat to pounds
