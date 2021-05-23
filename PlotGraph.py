@@ -91,22 +91,42 @@ def plotBarChartLog(df, monthOrYearLabel, yearLabel):
         print("Error: Graph Plotting Logs failed.\n", e)
         sys.exit()
 
+
+# Plot line graph showing top 5 spending departments in LCC per month over the year
 def plotLineGraph(df, monthOrYearLabel, yearLabel):
 
     # Try catch block to ensure Graph plotting fails safely
     try:
+        # Plot subplots on line graph
+        fig, ax = plt.subplots(figsize=(15, 10))
 
-        fig, ax = plt.subplots()
-        plt.figure(figsize=(15, 10))
+        # Set months on X axis
         ax.set_xticklabels(df['month'].unique(), rotation=90)
 
+        # Show lines by service area
         for name, group in df.groupby('Service Area'):
             ax.plot(group['month'], group['TotalVals'], label=name)
-
         ax.legend()
 
-        #plt.tight_layout()
+        # Turn off Scientific Notation
+        plt.ticklabel_format(style='plain', axis='y')
+
+        # Define grid
+        plt.minorticks_on()
+        plt.grid(which='major', linestyle='-', linewidth='0.5', color='black')
+        plt.grid(which='minor', linestyle=':', linewidth='0.5', color='green')
+        plt.title(monthOrYearLabel + " Council Spending per Service Area " + yearLabel)
+        plt.xlabel("Months")
+        plt.ylabel("Spending £'s")
+
+        # Save current figure for file creation later
+        savedPlot = plt.gcf()
+
+        # Show plotted graph
         plt.show()
+
+        # Save plotted graph for later use
+        savedPlot.savefig('graphs/standard/' + monthOrYearLabel + '_LCCSpending_' + yearLabel + '_LineGraph.png')
 
     except Exception as e:
         print("Error: Graph Plotting Line failed.\n", e)
