@@ -15,11 +15,12 @@ What do you get with this program?<br />
 - [x] Automated insertion of dataframes to MySQL database using SQLAlchemy - 100,273 records.
 - [x] Automated retrieval of Monthly spending per Service Area of the council as well as Yearly spending per Service Area.
 - [x] Display of retrieved data in pretty printed table format using Tabulate, for evaluation.
+- [x] Use of MatPlotLib to display graphs of retrieved data and save results to folders and files.
 <!-- -->
 <br />
 Future Updates:<br />
 <br />
 
-- [ ] Use of MatPlotLib to display graphs of retrieved data
+- [ ] TBC
 <br />
 <!-- end of the list -->
