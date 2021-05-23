@@ -36,10 +36,10 @@ if __name__ == '__main__':
             "[1 = New Files, 2 = Existing Files]: \n")
 
         # Converts the string into a integer
-        userChoice_number = int(txt)
+        userChoice_number = txt
 
         # Run program
-        if userChoice_number == 1:
+        if userChoice_number == '1':
 
             # Tell user program is fetching new files
             print("User selected to fetch new files, fetching...")
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             inputLoopFlag = True
 
         # User chose to analyse existing files
-        elif userChoice_number == 2:
+        elif userChoice_number == '2':
 
             # Input loop flag set to true to prevent repeating loop
             inputLoopFlag = True
@@ -83,30 +83,30 @@ if __name__ == '__main__':
         listOfDataFrames.append(fileAsDataFrame)
 
     # Merge list of dataframes together into one, for uploading to MySQL database
+    # (error, inputting 100,000+ records to MySQL in one insertion operation results in missing records)
     #mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
-    print("stop")
 
     # Check Database exists, if not create
-    #MySQLConnector.createDb(mySQLConnection)
+    MySQLConnector.createDb()
 
     # Drop table if exists
-    # MySQLConnector.dropTable(dbConnection)
+    MySQLConnector.dropTable()
 
     # Check Table exists, if not create
-    # MySQLConnector.createTable(dbConnection)
+    MySQLConnector.createTable()
 
     # Insert merged dataframe into MySQL database table
-    #for dataframe in listOfDataFrames:
-    #    MySQLConnector.insertDataframeToTable(dataframe, tableName)
-    print("Table inserted!")
+    for dataframe in listOfDataFrames:
+        MySQLConnector.insertDataframeToTable(dataframe, tableName)
+    print("Tables inserted to MySQL Successfully!")
 
     # Get sum of department spending per year
     yearSpendDF = MySQLConnector.selectSpendingPerYear(yearToSearch)
 
     # Get sum of department spending per month, list of dataframes
-    #dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
+    dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
 
-    # Convert year spending dataframe amounts to use pounds
+    # Convert spending dataframe amounts to use pounds
     # Set Locale to GB and GBPFormat to pounds
     locale.setlocale(locale.LC_ALL, 'en_GB')
     GBPFormat = '£{:,.2f}'
@@ -115,15 +115,29 @@ if __name__ == '__main__':
     yearSpendDF['TotalVals'] = yearSpendDF['TotalVals'].map(GBPFormat.format)
 
     # Spending per year in table
-    print(tabulate(yearSpendDF, headers = 'keys', tablefmt = 'pretty', showindex=False))
+    print(tabulate(yearSpendDF, headers='keys', tablefmt='pretty', showindex=False))
 
-    # Spending per month in table
-    #monthNum = 1
-    #for monthlyDf in dfSpendingPerMonth:
-    #    print("Month: " + str(monthNum))
-    #    monthlyDf['TotalVals'] = monthlyDf['TotalVals'].map(GBPFormat.format)
-    #    print(tabulate(monthlyDf, headers='keys', tablefmt='pretty', showindex=False))
-    #    monthNum += 1
+    # For each month print the table with spending by department
+    # Iterate over the month number until all records are done
+    monthNum = 1
+    for monthlyDf in dfSpendingPerMonth:
+
+        # Check Month number is not greater than 12,
+        # if it is then reset to 1 in case multiple years will be evaluated
+        if monthNum > 12:
+            monthNum = 1
+
+        # Print Monthly spending per department in pounds, in a pretty printed table
+        print("Month: " + str(monthNum))
+
+        # Format values as currency, great british pounds
+        monthlyDf['TotalVals'] = monthlyDf['TotalVals'].map(GBPFormat.format)
+
+        # Print table
+        print(tabulate(monthlyDf, headers='keys', tablefmt='pretty', showindex=False))
+
+        # Iterate month number
+        monthNum += 1
 
     # MatPlotLib of spending per month in pie chart
 
