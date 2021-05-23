@@ -1,4 +1,6 @@
 
+# Function gets the name of the month using a switch case statement,
+# and returns either the name or error message to caller
 def getMonthName(monthNum):
     monthNames = {
         1: "January",
@@ -14,4 +16,5 @@ def getMonthName(monthNum):
         11: "November",
         12: "December"
     }
+    # Return name to caller, or error message
     return monthNames.get(monthNum, "Invalid Month Number entered!")
