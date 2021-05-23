@@ -1,15 +1,26 @@
 import os
 
+from tabulate import tabulate
+
 import GetNewFilesFromURL
 import MergeDataframes
 import MySQLConnector
 import OpenFileAsDataframe
+from IPython.display import display
 
 # This is the main function of this Python Project
+import PlotGraph
+
 if __name__ == '__main__':
 
     # Flag determines run state of program
     inputLoopFlag = False
+
+    # Year of results to search for
+    yearToSearch = '2020'
+
+    # Define Table name for database
+    tableName = 'spendingrecords'
 
     # While flag is false repeat this...
     while not inputLoopFlag:
@@ -76,24 +87,57 @@ if __name__ == '__main__':
     # Check Database exists, if not create
     MySQLConnector.createDb(mySQLConnection)
 
+    # Close MySQL Connection
+    mySQLConnection.close()
+
     # Connect to Database
     dbConnection = MySQLConnector.connectToDb()
 
     # Drop table if exists
-    MySQLConnector.dropTable(dbConnection)
+    # MySQLConnector.dropTable(dbConnection)
 
     # Check Table exists, if not create
-    MySQLConnector.createTable(dbConnection)
+    # MySQLConnector.createTable(dbConnection)
 
     # Insert merged dataframe into MySQL database table
-    for dataframe in listOfDataFrames:
-        MySQLConnector.insertDataframeToTable(dbConnection, dataframe, 'spendingrecords')
+    #for dataframe in listOfDataFrames:
+    #    MySQLConnector.insertDataframeToTable(dataframe, tableName)
     print("Table inserted!")
+
+    # Close database connection
+    dbConnection.close()
+
+    # Get sum of department spending per year
+    yearSpendDF = MySQLConnector.selectSpendingPerYear(yearToSearch)
+
+    # Get sum of department spending per month, list of dataframes
+    dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
+
+    # MatPlotLib of spending per year in bar charts
+    print(tabulate(yearSpendDF, headers = 'keys', tablefmt = 'pretty', showindex=False))
+
+    #PlotGraph.plotBarChart(yearSpendDF)
+
+    # MatPLotLib of spending per month in bar charts
+    monthNum = 1
+    for monthlyDf in dfSpendingPerMonth:
+        print("Month: " + str(monthNum))
+        print(tabulate(monthlyDf, headers='keys', tablefmt='pretty', showindex=False))
+        monthNum += 1
+
+    # MatPlotLib of spending per month in pie chart
+
+    # MatPlotLib of spending per year in pie chart
+
+    # MatPlotLib of spending for each department over a year line graph
 
 
     # Create List of month/year strings to create column in dataframe for each file
     # Get the filename as month for input to database as month/year column
     # nameOfFile = RegexFileName.regexFileName('april-2020.xlsx')
+
+    # Close MySQL connection
+
 
     # Prompt user that program has finished execution
     print("Program run finished!")
