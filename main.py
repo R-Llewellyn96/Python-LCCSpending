@@ -1,10 +1,12 @@
 import os
+import sys
 
 from tabulate import tabulate
 
 import GetNewFilesFromURL
 import MergeDataframes
 import MySQLConnector
+import mysql.connector
 import OpenFileAsDataframe
 from IPython.display import display
 import locale
@@ -83,26 +85,15 @@ if __name__ == '__main__':
     # Merge list of dataframes together into one, for uploading to MySQL database
     #mergedDataframe = MergeDataframes.mergeDataframes(listOfDataFrames)
     print("stop")
-    # Check MySQL Database connection
-    mySQLConnection = MySQLConnector.connectToMySQL()
 
     # Check Database exists, if not create
-    MySQLConnector.createDb(mySQLConnection)
-
-    # Close MySQL Connection
-    mySQLConnection.close()
-
-    # Connect to Database
-    dbConnection = MySQLConnector.connectToDb()
+    #MySQLConnector.createDb(mySQLConnection)
 
     # Drop table if exists
     # MySQLConnector.dropTable(dbConnection)
 
     # Check Table exists, if not create
     # MySQLConnector.createTable(dbConnection)
-
-    # Close database connection
-    dbConnection.close()
 
     # Insert merged dataframe into MySQL database table
     #for dataframe in listOfDataFrames:
@@ -113,7 +104,7 @@ if __name__ == '__main__':
     yearSpendDF = MySQLConnector.selectSpendingPerYear(yearToSearch)
 
     # Get sum of department spending per month, list of dataframes
-    dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
+    #dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
 
     # Convert year spending dataframe amounts to use pounds
     # Set Locale to GB and GBPFormat to pounds
@@ -123,18 +114,16 @@ if __name__ == '__main__':
     # Apply currency to column
     yearSpendDF['TotalVals'] = yearSpendDF['TotalVals'].map(GBPFormat.format)
 
-    # MatPlotLib of spending per year in bar charts
+    # Spending per year in table
     print(tabulate(yearSpendDF, headers = 'keys', tablefmt = 'pretty', showindex=False))
 
-    #PlotGraph.plotBarChart(yearSpendDF)
-
-    # MatPLotLib of spending per month in bar charts
-    monthNum = 1
-    for monthlyDf in dfSpendingPerMonth:
-        print("Month: " + str(monthNum))
-        monthlyDf['TotalVals'] = monthlyDf['TotalVals'].map(GBPFormat.format)
-        print(tabulate(monthlyDf, headers='keys', tablefmt='pretty', showindex=False))
-        monthNum += 1
+    # Spending per month in table
+    #monthNum = 1
+    #for monthlyDf in dfSpendingPerMonth:
+    #    print("Month: " + str(monthNum))
+    #    monthlyDf['TotalVals'] = monthlyDf['TotalVals'].map(GBPFormat.format)
+    #    print(tabulate(monthlyDf, headers='keys', tablefmt='pretty', showindex=False))
+    #    monthNum += 1
 
     # MatPlotLib of spending per month in pie chart
 
@@ -142,13 +131,6 @@ if __name__ == '__main__':
 
     # MatPlotLib of spending for each department over a year line graph
 
-
-    # Create List of month/year strings to create column in dataframe for each file
-    # Get the filename as month for input to database as month/year column
-    # nameOfFile = RegexFileName.regexFileName('april-2020.xlsx')
-
-    # Close MySQL connection
-
-
     # Prompt user that program has finished execution
     print("Program run finished!")
+    sys.exit()

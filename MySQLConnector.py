@@ -12,55 +12,52 @@ import DBCredentials
 
 def connectToMySQL():
 
-    try:
-        # Define connection parameters
-        myDb = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='password'
-        )
+    # Define connection parameters
+    mySQLCon = mysql.connector.connect(host=DBCredentials.host,
+                                   user=DBCredentials.username,
+                                   password=DBCredentials.password)
 
-        # Return connection object to caller
-        return myDb
-    except Exception as e:
-        print("Connecting to MySQL database failed, please check login details and database status and try again")
-        print("Exception: ", e.__cause__)
-        sys.exit()
+    # Return connection object to caller
+    return mySQLCon
 
 
 # Create Database
-def createDb(myDb):
+def createDb():
+
+    # Connect to MySQL Server
+    mySQLCon = connectToMySQL()
 
     # Terminal cursor allows for execution of SQL Queries
-    dbCursor = myDb.cursor()
+    dbCursor = mySQLCon.cursor()
 
     # Create Database to hold our excel data
-    dbCursor.execute('CREATE DATABASE IF NOT EXISTS lccspending')
+    dbCursor.execute("CREATE DATABASE IF NOT EXISTS lccspending;")
 
     # Close Cursor
     dbCursor.close()
 
     # Close DB connection after use
-    myDb.close()
+    mySQLCon.close()
 
 
 # When database has been created, connect to it.
 def connectToDb():
 
     # Connection parameters to connect to database directly
-    lccSpendingDbConnection = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='password',
-        database='lccspending'
-    )
+    lccSpendingDbConnection = mysql.connector.connect(host=DBCredentials.host,
+                                                      user=DBCredentials.username,
+                                                      password=DBCredentials.password,
+                                                      database=DBCredentials.database)
 
     # Return database connection object to caller
     return lccSpendingDbConnection
 
 
 # Create table
-def createTable(lccSpendingDbConnection):
+def createTable():
+
+    # Connect to DB
+    lccSpendingDbConnection = connectToDb()
 
     # Get cursor to make SQL commands
     dbCursor = lccSpendingDbConnection.cursor()
@@ -76,13 +73,16 @@ def createTable(lccSpendingDbConnection):
 
 
 # Delete Table (Useful for repeated runs)
-def dropTable(lccSpendingDbConnection):
+def dropTable():
+
+    # Connect to DB
+    lccSpendingDbConnection = connectToDb()
 
     # Get cursor to make SQL commands
     dbCursor = lccSpendingDbConnection.cursor()
 
     # Execute SQL statement to create table to hold excel records
-    dbCursor.execute('DROP TABLE IF EXISTS spendingrecords')
+    dbCursor.execute("DROP TABLE IF EXISTS spendingrecords;")
 
     # Close Cursor
     dbCursor.close()
@@ -108,7 +108,7 @@ def insertDataframeToTable(df, tableName):
 def selectSpendingPerYear(yearToSearch):
 
     # Select statement to get per department spending for a year
-    sqlStatement = "SELECT `Service Area`, SUM(`Actual Value`) AS `TotalVals` FROM `spendingrecords` WHERE YEAR(`Posting date`) = "+yearToSearch+" GROUP BY `Service Area` ORDER BY `TotalVals` DESC"
+    sqlStatement = "SELECT `Service Area`, SUM(`Actual Value`) AS `TotalVals` FROM `spendingrecords` WHERE YEAR(`Posting date`) = "+yearToSearch+" GROUP BY `Service Area` ORDER BY `TotalVals` DESC;"
 
     # Create engine from pymysql
     engine = create_engine(
@@ -143,7 +143,7 @@ def selectSpendingPerMonth(yearToSearch):
         monthToSearch = str(monthToIterate)
 
         # Select statement to get per department spending for a month
-        sqlStatement = "SELECT `Service Area`, SUM(`Actual Value`) AS `TotalVals` FROM `spendingrecords` WHERE YEAR(`Posting date`) = " + yearToSearch + " AND MONTH(`Posting date`) = " + monthToSearch + " GROUP BY `Service Area` ORDER BY `TotalVals` DESC"
+        sqlStatement = "SELECT `Service Area`, SUM(`Actual Value`) AS `TotalVals` FROM `spendingrecords` WHERE YEAR(`Posting date`) = " + yearToSearch + " AND MONTH(`Posting date`) = " + monthToSearch + " GROUP BY `Service Area` ORDER BY `TotalVals` DESC;"
 
         # Execute SQL statement to get spending per month as dataframe
         df = pd.read_sql(sqlStatement, con=engine)
@@ -163,12 +163,13 @@ def selectSpendingPerMonth(yearToSearch):
 
 # Select Spending for a specific Month
 def selectSpendingPerSpecificMonth(monthToSearch, yearToSearch):
+
     # Create engine from pymysql
     engine = create_engine(
         "mysql+pymysql://" + DBCredentials.username + ":" + DBCredentials.password + "@" + DBCredentials.host + "/" + DBCredentials.database)
 
     # Select statement to get per department spending for a month
-    sqlStatement = "SELECT `Service Area`, SUM(`Actual Value`) AS `TotalVals` FROM `spendingrecords` WHERE YEAR(`Posting date`) = " + yearToSearch + " AND MONTH(`Posting date`) = " + monthToSearch + " GROUP BY `Service Area` ORDER BY `TotalVals` DESC"
+    sqlStatement = "SELECT `Service Area`, SUM(`Actual Value`) AS `TotalVals` FROM `spendingrecords` WHERE YEAR(`Posting date`) = " + yearToSearch + " AND MONTH(`Posting date`) = " + monthToSearch + " GROUP BY `Service Area` ORDER BY `TotalVals` DESC;"
 
     # Execute SQL statement to get spending per month as dataframe
     df = pd.read_sql(sqlStatement, con=engine)
