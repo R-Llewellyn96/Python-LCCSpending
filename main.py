@@ -7,6 +7,8 @@ import MergeDataframes
 import MySQLConnector
 import OpenFileAsDataframe
 from IPython.display import display
+import locale
+from locale import atof
 
 # This is the main function of this Python Project
 import PlotGraph
@@ -99,19 +101,27 @@ if __name__ == '__main__':
     # Check Table exists, if not create
     # MySQLConnector.createTable(dbConnection)
 
+    # Close database connection
+    dbConnection.close()
+
     # Insert merged dataframe into MySQL database table
     #for dataframe in listOfDataFrames:
     #    MySQLConnector.insertDataframeToTable(dataframe, tableName)
     print("Table inserted!")
-
-    # Close database connection
-    dbConnection.close()
 
     # Get sum of department spending per year
     yearSpendDF = MySQLConnector.selectSpendingPerYear(yearToSearch)
 
     # Get sum of department spending per month, list of dataframes
     dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
+
+    # Convert year spending dataframe amounts to use pounds
+    # Set Locale to GB and GBPFormat to pounds
+    locale.setlocale(locale.LC_ALL, 'en_GB')
+    GBPFormat = '£{:,.2f}'
+
+    # Apply currency to column
+    yearSpendDF['TotalVals'] = yearSpendDF['TotalVals'].map(GBPFormat.format)
 
     # MatPlotLib of spending per year in bar charts
     print(tabulate(yearSpendDF, headers = 'keys', tablefmt = 'pretty', showindex=False))
@@ -122,6 +132,7 @@ if __name__ == '__main__':
     monthNum = 1
     for monthlyDf in dfSpendingPerMonth:
         print("Month: " + str(monthNum))
+        monthlyDf['TotalVals'] = monthlyDf['TotalVals'].map(GBPFormat.format)
         print(tabulate(monthlyDf, headers='keys', tablefmt='pretty', showindex=False))
         monthNum += 1
 

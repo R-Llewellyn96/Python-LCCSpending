@@ -37,6 +37,12 @@ def createDb(myDb):
     # Create Database to hold our excel data
     dbCursor.execute('CREATE DATABASE IF NOT EXISTS lccspending')
 
+    # Close Cursor
+    dbCursor.close()
+
+    # Close DB connection after use
+    myDb.close()
+
 
 # When database has been created, connect to it.
 def connectToDb():
@@ -62,6 +68,12 @@ def createTable(lccSpendingDbConnection):
     # Execute SQL statement to create table to hold excel records
     dbCursor.execute("CREATE TABLE IF NOT EXISTS `lccspending`.`spendingrecords` ( `id` INT NOT NULL AUTO_INCREMENT , `Service Area` VARCHAR(255) NOT NULL , `Expense Type` VARCHAR(255) NOT NULL , `Description` VARCHAR(255) NOT NULL , `SAP Document Number` BIGINT NOT NULL , `Posting date` DATE NOT NULL , `Vendor` VARCHAR(255) NOT NULL , `Actual Value` DECIMAL(18,2) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;")
 
+    # Close Cursor
+    dbCursor.close()
+
+    # Close DB connection after use
+    lccSpendingDbConnection.close()
+
 
 # Delete Table (Useful for repeated runs)
 def dropTable(lccSpendingDbConnection):
@@ -71,6 +83,12 @@ def dropTable(lccSpendingDbConnection):
 
     # Execute SQL statement to create table to hold excel records
     dbCursor.execute('DROP TABLE IF EXISTS spendingrecords')
+
+    # Close Cursor
+    dbCursor.close()
+
+    # Close DB connection after use
+    lccSpendingDbConnection.close()
 
 
 # Insert DataFrame to table
