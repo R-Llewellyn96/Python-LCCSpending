@@ -1,13 +1,6 @@
 import sys
-
-import matplotlib as mpl
 import pandas as pd
-from pandas import DataFrame
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import figure
-import numpy as np
-from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
-import matplotlib.ticker as mticker
 
 
 # Plot bar chart of dataframe

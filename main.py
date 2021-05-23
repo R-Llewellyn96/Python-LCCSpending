@@ -9,10 +9,10 @@ import MySQLConnector
 import NamesOfMonths
 import OpenFileAsDataframe
 import locale
-
-# This is the main function of this Python Project
 import PlotGraph
 
+
+# This is the main function of this Python Project
 if __name__ == '__main__':
 
     # Flag determines run state of program

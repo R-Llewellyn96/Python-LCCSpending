@@ -8,6 +8,7 @@ import pymysql
 import DBCredentials
 
 
+# Connect to MySQL Server database
 def connectToMySQL():
 
     # Try catch block to ensure safe failure if connection fails to authenticate or Server not found
