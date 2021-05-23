@@ -7,6 +7,8 @@ import GetNewFilesFromURL
 import MergeDataframes
 import MySQLConnector
 import mysql.connector
+
+import NamesOfMonths
 import OpenFileAsDataframe
 from IPython.display import display
 import locale
@@ -103,8 +105,56 @@ if __name__ == '__main__':
     # Get sum of department spending per year
     yearSpendDF = MySQLConnector.selectSpendingPerYear(yearToSearch)
 
+    # Get top 5 service areas from yearly spending so we know what to plot on line graph
+    listOfSANames = MergeDataframes.getTopFive(yearSpendDF)
+
+    # Make a copy for Graphing use (Conversion to currency changes dType to String)
+    #yearSpendDFGraph = yearSpendDF.copy()
+
     # Get sum of department spending per month, list of dataframes
     dfSpendingPerMonth = MySQLConnector.selectSpendingPerMonth(yearToSearch)
+
+    # Make a copy for Graphing use (Conversion to currency changes dType to String)
+    dfSpendingPerMonthGraph = dfSpendingPerMonth.copy()
+
+    # Add Month Column to per month spending for easy line plotting
+    linePlotDf = MergeDataframes.addMonthToDataframes(dfSpendingPerMonthGraph, listOfSANames)
+
+    # Merge monthly dataframes to plot per month as a line graph
+    mergedDataframe = MergeDataframes.mergeDataframes(linePlotDf)
+    # Do Graphs first then print tables
+
+    # Plot line graph
+    PlotGraph.plotLineGraph(mergedDataframe, 'Yearly', yearToSearch)
+
+    # MatPlotLib of spending per year in Bar chart
+    PlotGraph.plotBarChart(yearSpendDF, 'Yearly', yearToSearch)
+
+    # MatPlotLib of spending per year in Bar chart Logarithmic
+    PlotGraph.plotBarChartLog(yearSpendDF, 'Yearly', yearToSearch)
+
+    # MatPlotLib of spending per month in pie chart
+    # For each month print the table with spending by department
+    # Iterate over the month number until all records are done
+    monthNum = 1
+    for monthlyDf in dfSpendingPerMonth:
+
+        # Check Month number is not greater than 12,
+        # if it is then reset to 1 in case multiple years will be evaluated
+        if monthNum > 12:
+            monthNum = 1
+
+        # Get name of Month
+        monthLabel = NamesOfMonths.getMonthName(monthNum)
+
+        # Plot bar graph in both Standard and Logarithmic form
+        PlotGraph.plotBarChart(monthlyDf, monthLabel, yearToSearch)
+        PlotGraph.plotBarChartLog(monthlyDf, monthLabel, yearToSearch)
+
+        # Iterate month number
+        monthNum += 1
+
+    # MatPlotLib of spending for each department over a year line graph
 
     # Convert spending dataframe amounts to use pounds
     # Set Locale to GB and GBPFormat to pounds
@@ -138,12 +188,6 @@ if __name__ == '__main__':
 
         # Iterate month number
         monthNum += 1
-
-    # MatPlotLib of spending per month in pie chart
-
-    # MatPlotLib of spending per year in pie chart
-
-    # MatPlotLib of spending for each department over a year line graph
 
     # Prompt user that program has finished execution
     print("Program run finished!")
